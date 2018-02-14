@@ -1,22 +1,25 @@
-sudo: required
+sudo: false
 language: php
 
 notifications:
   email: false
 
 php:
-  - 7.0
-  - 7.1
+  - "7.0"
+  - "7.1"
+  - "7.2"
 
 env:
   global:
     - TEST_PHP_ARGS="-q"
     - REPORT_EXIT_STATUS=1
 
-before_script:
+script:
   - cd extension
   - phpize
   - ./configure
-  - make -j4
+  - make
+  - make install
+  - make -f Makefile.local test_with_exit_status
 
-script: make -f Makefile.local test_with_exit_status
+after_failure: "tail -vn+1 tests/*.diff"
